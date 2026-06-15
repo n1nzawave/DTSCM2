@@ -1,5 +1,6 @@
 package com.example.dtscm2;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -10,7 +11,8 @@ import java.util.Map;
 
 @Service
 public class TelegramNotificationService {
-    private final String botToken = "8718739256:AAESwmxIlavz4mix6LUgZYXLOrRCgsiaZw4";
+    @Value("${spring.telegram.bot.token:}")
+    private String botToken;
     private final RestTemplate restTemplate = new RestTemplate();
 
     public void sendMessage(String chatId, String text){
