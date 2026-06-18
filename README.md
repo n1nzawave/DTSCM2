@@ -37,19 +37,12 @@ Clone the repo and create a `.env` file in the project root:
 POSTGRES_DB=dtscm2
 POSTGRES_USER=admin
 POSTGRES_PASSWORD=your_password
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token
 ```
 
-Before starting, set your Telegram credentials. In `TelegramNotificationService.java` replace the bot token:
+The bot token is read from the environment at startup (`spring.telegram.bot.token` in `application.yml`) — no need to edit any source files.
 
-```java
-private final String botToken = "YOUR_BOT_TOKEN";
-```
-
-And in `TaskWorker.java` replace the hardcoded chat ID:
-
-```java
-telegramNotificationService.sendMessage("YOUR_CHAT_ID", errorMessage);
-```
+> **Note:** the Telegram chat ID that receives alerts is currently hardcoded in `TaskWorker.java`. Update it there to your own chat ID before running.
 
 Then start everything:
 
@@ -105,6 +98,8 @@ CREATE TABLE task_log (
 );
 ```
 
+Schema is created automatically on startup via `schema.sql` (`spring.sql.init.mode: always`), and validated against the JPA entities (`ddl-auto: validate`).
+
 ---
 
 ## RabbitMQ management UI
@@ -113,6 +108,9 @@ Available at `http://localhost:15672`. Default credentials: `admin` / `password`
 
 ---
 
-## Notes
+## Roadmap / known limitations
 
-The bot token and chat ID are currently hardcoded in the source. Make sure to move them to environment variables before pushing to a public repository.
+- Telegram chat ID is hardcoded — should be moved to an environment variable alongside the bot token.
+- No input validation on `POST /api/tasks` (e.g. negative intervals, malformed URLs are accepted as-is).
+- No web dashboard yet — tasks and metrics can currently only be inspected via the REST API or directly in the database.
+- No retry/backoff or dead-letter queue if a worker fails to process a message.
